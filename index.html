@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fil">
 <head>
   <meta charset="UTF-8">
-  <title>Yellow Pages Mockup</title>
+  <title>Yellow Pages PH – Hanap agad</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <style>
-    /* quick custom yellow */
-    :root { --yp: #f7d800; }
-    .bg-yp { background-color: var(--yp); }
-    .text-yp { color: var(--yp); }
+    :root { --pal: #f9b000; }
+    .bg-pal { background-color: var(--pal); }
+    .text-pal { color: var(--pal); }
+    .hover-pal:hover { background-color: var(--pal); color:#fff; }
   </style>
 </head>
-<body class="bg-gray-50">
-  <header class="bg-yp shadow">
+<body class="bg-gray-50 text-gray-800">
+  <!-- Header -->
+  <header class="bg-pal shadow">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">Yellow Pages</h1>
-      <span class="text-sm text-gray-700">Mockup – GitHub Pages</span>
+      <h1 class="text-2xl font-bold text-white">Yellow Pages PH</h1>
+      <span class="text-sm text-white opacity-90">Hanap agad sa Pilipinas</span>
     </div>
   </header>
 
@@ -29,8 +30,8 @@
       <input
         x-model="query"
         @input="search()"
-        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yp"
-        placeholder="Search for a service (e.g. plumber)"
+        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pal"
+        placeholder="Anong hanap mo? (hal. plumber, electrician, cake shop)"
       >
       <div class="overflow-y-auto pr-2 space-y-3">
         <template x-for="b in filtered" :key="b.id">
@@ -38,13 +39,18 @@
             <h2 class="font-semibold text-lg" x-text="b.name"></h2>
             <p class="text-sm text-gray-600" x-text="b.category"></p>
             <p class="text-sm mt-1" x-text="b.address"></p>
+
+            <!-- Phone -->
             <div class="mt-3 flex items-center space-x-3 text-sm">
-              <a :href="'tel:'+b.phone" class="text-yp font-medium">📞 <span x-text="b.phone"></span></a>
-              <button @click="directions(b)" class="text-blue-600 font-medium">📍 Directions</button>
+              <a :href="'tel:'+b.phoneIntl" class="text-pal font-medium">📞 <span x-text="b.phoneLocal"></span></a>
+              <button @click="directions(b)" class="text-blue-600 font-medium">📍 Direksyon</button>
             </div>
-            <div class="mt-2 flex space-x-3 text-gray-500">
-              <a :href="b.ig" target="_blank" class="hover:text-pink-500">IG</a>
-              <a :href="b.wa" target="_blank" class="hover:text-green-500">WA</a>
+
+            <!-- Action row: Grab + Globe/Social -->
+            <div class="mt-2 flex flex-wrap gap-2 text-xs">
+              <a :href="grabUri(b)" target="_blank" class="px-3 py-1 border border-green-600 text-green-600 rounded-full hover-pal">Open in Grab</a>
+              <a :href="'https://wa.me/'+b.phoneIntl.substr(1)" target="_blank" class="px-3 py-1 border border-green-500 text-green-500 rounded-full hover-pal">Chat sa WhatsApp</a>
+              <a :href="b.ig" target="_blank" class="px-3 py-1 border border-pink-500 text-pink-500 rounded-full hover-pal">IG</a>
             </div>
           </div>
         </template>
@@ -57,35 +63,35 @@
     </section>
   </div>
 
-  <!-- Google -->
+  <!-- Google Maps -->
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3iwTmt5Q5l5kpLKv1Y5r1bKj6X5krt8A&libraries=places">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3iwTmt5Q5l5kpLKv1Y5r1bKj6X5krt8A&region=PH&language=fil">
   </script>
 
   <script>
-    const FAKE = [
-      {id:1, name:"ABC Plumbers", category:"Plumber", phone:"+15551234567", address:"123 Main St, New York, NY", lat:40.7128, lng:-74.0060, ig:"https://instagram.com/abc", wa:"https://wa.me/15551234567"},
-      {id:2, name:"Quick Electric", category:"Electrician", phone:"+15559876543", address:"456 Oak Ave, Brooklyn, NY", lat:40.6782, lng:-73.9442, ig:"https://instagram.com/qe", wa:"https://wa.me/15559876543"},
-      {id:3, name:"Clean Carpets Co", category:"Carpet Cleaning", phone:"+15556543210", address:"789 Pine Rd, Queens, NY", lat:40.7282, lng:-73.7949, ig:"https://instagram.com/clean", wa:"https://wa.me/15556543210"}
+    // Fake PH listings
+    const FAKE_PH = [
+      {id:1, name:"Magiting Plumbing Services", category:"Plumber", phoneIntl:"+639171234567", phoneLocal:"0917 123 4567", address:"123 Magiting St., Quezon City, Metro Manila", lat:14.6760, lng:121.0437, ig:"https://instagram.com/magitingplumber"},
+      {id:2, name:"Makati Electrical Solutions", category:"Electrician", phoneIntl:"+639998765432", phoneLocal:"0999 876 5432", address:"456 Ayala Ave., Makati City", lat:14.5565, lng:121.0236, ig:"https://instagram.com/makatielec"},
+      {id:3, name:"Cebu Cakes & Bakes", category:"Cake Shop", phoneIntl:"+639565432109", phoneLocal:"0956 543 2109", address:"789 Osmeña Blvd., Cebu City", lat:10.3157, lng:123.8854, ig:"https://instagram.com/cebuflavor"},
+      {id:4, name:"Davao Desktop Repair", category:"Computer Repair", phoneIntl:"+639681111222", phoneLocal:"0968 111 1222", address:"123 Roxas Ave., Davao City", lat:7.1907, lng:125.4553, ig:"https://instagram.com/davrepair"}
     ];
 
     function app() {
       return {
-        query:'',
-        filtered: FAKE,
+        query:'', filtered: FAKE_PH,
         map:null, markers:[],
         initMap() {
-          const ny = {lat:40.7128, lng:-74.0060};
+          // Start on Metro Manila
+          const manila = {lat:14.5995, lng:120.9842};
           this.map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 11, center: ny, mapTypeControl:false, streetViewControl:false
+            zoom: 11, center: manila, mapTypeControl:false, streetViewControl:false
           });
-          this.showMarkers(FAKE);
+          this.showMarkers(FAKE_PH);
         },
         showMarkers(list) {
-          // clear old
           this.markers.forEach(m => m.setMap(null));
           this.markers = [];
-          // add new
           list.forEach(b => {
             const m = new google.maps.Marker({position:{lat:b.lat,lng:b.lng}, map:this.map, title:b.name});
             this.markers.push(m);
@@ -94,13 +100,17 @@
         search() {
           const q = this.query.toLowerCase();
           this.filtered = q
-            ? FAKE.filter(b => b.name.toLowerCase().includes(q) || b.category.toLowerCase().includes(q))
-            : FAKE;
+            ? FAKE_PH.filter(b => b.name.toLowerCase().includes(q) || b.category.toLowerCase().includes(q))
+            : FAKE_PH;
           this.showMarkers(this.filtered);
         },
         directions(b) {
-          const url = `https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}`;
+          const url = `https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}&region=PH`;
           window.open(url, '_blank');
+        },
+        grabUri(b) {
+          // Grab deep-link: lat,lng
+          return `https://grb.to/dir?dest=${b.lat},${b.lng}&ref=YP`;
         }
       };
     }
