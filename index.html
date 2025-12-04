@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Yellow Pages Mockup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>
+    /* quick custom yellow */
+    :root { --yp: #f7d800; }
+    .bg-yp { background-color: var(--yp); }
+    .text-yp { color: var(--yp); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <header class="bg-yp shadow">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-gray-900">Yellow Pages</h1>
+      <span class="text-sm text-gray-700">Mockup – GitHub Pages</span>
+    </div>
+  </header>
+
+  <!-- Alpine container -->
+  <div x-data="app()" x-init="initMap()" class="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-2 gap-6 h-[calc(100vh-96px)]">
+
+    <!-- Left: search + cards -->
+    <section class="flex flex-col space-y-4 overflow-hidden">
+      <input
+        x-model="query"
+        @input="search()"
+        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yp"
+        placeholder="Search for a service (e.g. plumber)"
+      >
+      <div class="overflow-y-auto pr-2 space-y-3">
+        <template x-for="b in filtered" :key="b.id">
+          <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="font-semibold text-lg" x-text="b.name"></h2>
+            <p class="text-sm text-gray-600" x-text="b.category"></p>
+            <p class="text-sm mt-1" x-text="b.address"></p>
+            <div class="mt-3 flex items-center space-x-3 text-sm">
+              <a :href="'tel:'+b.phone" class="text-yp font-medium">📞 <span x-text="b.phone"></span></a>
+              <button @click="directions(b)" class="text-blue-600 font-medium">📍 Directions</button>
+            </div>
+            <div class="mt-2 flex space-x-3 text-gray-500">
+              <a :href="b.ig" target="_blank" class="hover:text-pink-500">IG</a>
+              <a :href="b.wa" target="_blank" class="hover:text-green-500">WA</a>
+            </div>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- Right: map -->
+    <section class="rounded-lg overflow-hidden shadow">
+      <div id="map" class="w-full h-full"></div>
+    </section>
+  </div>
+
+  <!-- Google -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3iwTmt5Q5l5kpLKv1Y5r1bKj6X5krt8A&libraries=places">
+  </script>
+
+  <script>
+    const FAKE = [
+      {id:1, name:"ABC Plumbers", category:"Plumber", phone:"+15551234567", address:"123 Main St, New York, NY", lat:40.7128, lng:-74.0060, ig:"https://instagram.com/abc", wa:"https://wa.me/15551234567"},
+      {id:2, name:"Quick Electric", category:"Electrician", phone:"+15559876543", address:"456 Oak Ave, Brooklyn, NY", lat:40.6782, lng:-73.9442, ig:"https://instagram.com/qe", wa:"https://wa.me/15559876543"},
+      {id:3, name:"Clean Carpets Co", category:"Carpet Cleaning", phone:"+15556543210", address:"789 Pine Rd, Queens, NY", lat:40.7282, lng:-73.7949, ig:"https://instagram.com/clean", wa:"https://wa.me/15556543210"}
+    ];
+
+    function app() {
+      return {
+        query:'',
+        filtered: FAKE,
+        map:null, markers:[],
+        initMap() {
+          const ny = {lat:40.7128, lng:-74.0060};
+          this.map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 11, center: ny, mapTypeControl:false, streetViewControl:false
+          });
+          this.showMarkers(FAKE);
+        },
+        showMarkers(list) {
+          // clear old
+          this.markers.forEach(m => m.setMap(null));
+          this.markers = [];
+          // add new
+          list.forEach(b => {
+            const m = new google.maps.Marker({position:{lat:b.lat,lng:b.lng}, map:this.map, title:b.name});
+            this.markers.push(m);
+          });
+        },
+        search() {
+          const q = this.query.toLowerCase();
+          this.filtered = q
+            ? FAKE.filter(b => b.name.toLowerCase().includes(q) || b.category.toLowerCase().includes(q))
+            : FAKE;
+          this.showMarkers(this.filtered);
+        },
+        directions(b) {
+          const url = `https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}`;
+          window.open(url, '_blank');
+        }
+      };
+    }
+  </script>
+</body>
+</html>
